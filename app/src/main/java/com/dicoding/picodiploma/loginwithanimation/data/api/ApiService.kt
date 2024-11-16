@@ -2,8 +2,11 @@ package com.dicoding.picodiploma.loginwithanimation.data.api
 
 import com.dicoding.picodiploma.loginwithanimation.data.LoginResponse
 import com.dicoding.picodiploma.loginwithanimation.data.RegisterResponse
+import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface ApiService {
@@ -21,5 +24,9 @@ interface ApiService {
         @Field("email") email: String,
         @Field("password") password: String
     ): LoginResponse
+
+    @GET("stories")
+    suspend fun getStories(
+    ): StoryResponse
 
 }

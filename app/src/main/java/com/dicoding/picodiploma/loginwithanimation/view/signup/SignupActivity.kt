@@ -6,10 +6,14 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
 import com.dicoding.picodiploma.loginwithanimation.data.api.ApiConfig
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
@@ -25,24 +29,31 @@ class SignupActivity : AppCompatActivity() {
         ViewModelFactory.getInstance(this)
     }
 
+    private var isLoading = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupBinding.inflate(layoutInflater)
+        enableEdgeToEdge()
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.registerView)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         binding.signupButton.setOnClickListener {
             val name = binding.nameEditText.text.toString()
             val email = binding.emailEditText.text.toString()
             val password = binding.passwordEditText.text.toString()
+            showLoading(true)
             registerViewModel.register(name, email, password)
         }
 
         lifecycleScope.launch {
             registerViewModel.registerState.collect { state ->
                 when (state) {
-                    is ResultState.Loading -> {
-                        showLoading(true)
-                    }
+                    is ResultState.Loading -> {}
 
                     is ResultState.Success -> {
                         showLoading(false)
@@ -60,6 +71,7 @@ class SignupActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
+        this.isLoading = isLoading
         binding.progressIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 }

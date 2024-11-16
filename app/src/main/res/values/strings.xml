@@ -14,5 +14,8 @@
     <string name="greeting">Halo %1$s,</string>
     <string name="logout">Keluar</string>
     <string name="register">belum punya akun? klik untuk daftar</string>
+    <string name="add_story">add story</string>
+    <string name="description">Deskripsi</string>
+    <string name="list_item_photo">list item photo</string>
 
 </resources>

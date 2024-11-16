@@ -1,12 +1,16 @@
 package com.dicoding.picodiploma.loginwithanimation.data.api
 
+import android.util.Log
 import com.dicoding.picodiploma.loginwithanimation.data.ErrorResponse
 import com.dicoding.picodiploma.loginwithanimation.data.LoginResponse
 import com.dicoding.picodiploma.loginwithanimation.data.RegisterResponse
+import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.HttpException
 
 class UserRepository private constructor(
@@ -15,10 +19,16 @@ class UserRepository private constructor(
 
 
 ) {
-
-    suspend fun saveSession(user: UserModel) {
-        userPreference.saveSession(user)
+    suspend fun getStories(): StoryResponse {
+        try {
+            userPreference.getSession().firstOrNull()?.token
+                ?: throw NullPointerException("Token is null")
+            return apiService.getStories()
+        } catch (e: Exception) {
+            throw e
+        }
     }
+
 
     fun getSession(): Flow<UserModel> {
         return userPreference.getSession()
@@ -40,20 +50,34 @@ class UserRepository private constructor(
     }
 
     suspend fun login(email: String, password: String): String {
-        return try {
+        try {
             val response = apiService.login(email, password)
-            val user = UserModel(email, response.loginResult?.token ?: "")
+            Log.d("UserRepository", "Login response: $response")
+
+            val token = response.loginResult?.token
+            if (token.isNullOrEmpty()) {
+                throw Exception("Token not received from server")
+            }
+
+            val user = UserModel(
+                email = email,
+                token = token,
+                isLogin = true
+            )
+
+            Log.d("UserRepository", "Saving user session after login: $user")
             userPreference.saveSession(user)
-            response.message ?: "Login successful"
-        } catch (e: HttpException) {
-            val jsonInString = e.response()?.errorBody()?.string()
-            val errorBody = Gson().fromJson(jsonInString, ErrorResponse::class.java)
-            errorBody.message ?: "An error occurred"
+
+            // Verifikasi session tersimpan
+            val savedUser = userPreference.getSession().first()
+            Log.d("UserRepository", "Verified saved session: $savedUser")
+
+            return response.message ?: "Login successful"
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Login error: ${e.message}")
+            throw e
         }
     }
-
-
-
 
 
     companion object {

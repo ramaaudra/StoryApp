@@ -33,6 +33,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 dependencies {
@@ -49,6 +50,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.activity.ktx)
+
+    implementation (libs.glide)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit2.converter.gson)

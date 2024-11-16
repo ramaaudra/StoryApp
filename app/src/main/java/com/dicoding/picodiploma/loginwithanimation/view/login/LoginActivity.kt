@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.view.WindowInsets
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -58,21 +56,19 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.loginState.collect { state ->
                 when (state) {
-                    is ResultState.Loading -> {
-                    }
+                    is ResultState.Loading -> {}
                     is ResultState.Success -> {
                         showLoading(false)
-                        Toast.makeText(this@LoginActivity, state.data, Toast.LENGTH_SHORT).show()
-                        viewModel.saveSession(UserModel(binding.emailEditText.text.toString(), ""))
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        finish()
                     }
                     is ResultState.Error -> {
                         showLoading(false)
-                        AlertDialog.Builder(this@LoginActivity)
-                            .setTitle("Error")
-                            .setMessage(state.message)
-                            .setPositiveButton("OK", null)
-                            .show()
+                        Toast.makeText(
+                            this@LoginActivity,
+                            state.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
