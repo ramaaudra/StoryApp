@@ -8,6 +8,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiConfig {
+    @Volatile
+    private var apiService: ApiService? = null
+
     fun getApiService(token: String): ApiService {
         val loggingInterceptor = HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -21,7 +24,6 @@ object ApiConfig {
             } else {
                 req.newBuilder().build()
             }
-
             Log.d("ApiConfig", "Request Headers: ${requestHeaders.headers}")
             chain.proceed(requestHeaders)
         }
@@ -38,5 +40,13 @@ object ApiConfig {
             .build()
 
         return retrofit.create(ApiService::class.java)
+    }
+
+    fun updateApiService(token: String) {
+        apiService = getApiService(token)
+    }
+
+    fun getCachedApiService(): ApiService? {
+        return apiService
     }
 }

@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
+import com.dicoding.picodiploma.loginwithanimation.data.api.ApiConfig
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityMainBinding
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
@@ -40,15 +41,16 @@ class MainActivity : AppCompatActivity() {
 
 
         viewModel.getSession().observe(this) { user ->
-            Log.d("MainActivity", "Session observer triggered with token: ${user.token}")
-            if (!user.isLogin || user.token.isEmpty()) {
-                Log.d("MainActivity", "Invalid session, redirecting to login")
+            if (user.token.isEmpty()) {
                 startActivity(Intent(this, LoginActivity::class.java))
                 finish()
             } else {
+                // Pastikan ApiService menggunakan token yang benar
+                ApiConfig.updateApiService(user.token)
                 viewModel.getStories()
             }
         }
+
         setupAction()
         setupRecyclerView()
         observeStories()

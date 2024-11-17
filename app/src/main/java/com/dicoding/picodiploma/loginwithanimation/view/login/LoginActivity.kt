@@ -17,6 +17,7 @@ import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityLoginBind
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.main.MainActivity
 import com.dicoding.picodiploma.loginwithanimation.view.signup.SignupActivity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -57,6 +58,7 @@ class LoginActivity : AppCompatActivity() {
                     is ResultState.Loading -> {}
                     is ResultState.Success -> {
                         showLoading(false)
+                        delay(500)
                         val intent = Intent(this@LoginActivity, MainActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
