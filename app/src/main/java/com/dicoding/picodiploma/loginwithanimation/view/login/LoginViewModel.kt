@@ -14,18 +14,12 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
     private val _loginState = MutableStateFlow<ResultState<String>>(ResultState.Loading)
     val loginState: StateFlow<ResultState<String>> = _loginState
 
-
-
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _loginState.value = ResultState.Loading
             try {
-                Log.d("LoginViewModel", "Attempting login for email: $email")
                 val message = repository.login(email, password)
-
-                // Verify session after login
                 repository.getSession().first().let { user ->
-                    Log.d("LoginViewModel", "Session after login: $user")
                     if (user.token.isEmpty()) {
                         _loginState.value = ResultState.Error("Login failed: Token not saved")
                     } else {
@@ -33,7 +27,6 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
                     }
                 }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Login error", e)
                 _loginState.value = ResultState.Error(e.message ?: "Unknown Error")
             }
         }

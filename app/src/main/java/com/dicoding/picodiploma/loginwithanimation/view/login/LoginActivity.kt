@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityLoginBinding
@@ -40,7 +41,6 @@ class LoginActivity : AppCompatActivity() {
         setupAction()
     }
 
-
     private fun setupAction() {
         binding.loginButton.setOnClickListener {
             if (validateFields()) {
@@ -50,7 +50,6 @@ class LoginActivity : AppCompatActivity() {
                 viewModel.login(email, password)
             }
         }
-
 
         lifecycleScope.launch {
             viewModel.loginState.collect { state ->
@@ -96,7 +95,6 @@ class LoginActivity : AppCompatActivity() {
             else -> true
         }
     }
-
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

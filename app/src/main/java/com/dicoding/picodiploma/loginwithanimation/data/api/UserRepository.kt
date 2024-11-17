@@ -20,24 +20,12 @@ import retrofit2.HttpException
 
 
 class UserRepository private constructor(
-    private val userPreference: UserPreference
+    private val userPreference: UserPreference,
+    private val apiService: ApiService
 ) {
-    // Helper function untuk mendapatkan ApiService dengan token terbaru
-    private suspend fun getApiService(): ApiService {
-        val user = userPreference.getSession().first()
-        val token = user.token
-
-        if (token.isEmpty()) {
-            Log.e("UserRepository", "Token is empty when trying to get API service")
-            throw IllegalStateException("Token not found")
-        }
-
-        Log.d("UserRepository", "Getting API service with token format: Bearer $token")
-        return ApiConfig.getApiService(token)
-    }
 
     suspend fun getStories(): StoryResponse {
-        try {
+        return try {
             val user = userPreference.getSession().firstOrNull()
                 ?: throw NullPointerException("User session is null")
 
@@ -46,7 +34,7 @@ class UserRepository private constructor(
             }
 
             Log.d("UserRepository", "Fetching stories with token: ${user.token}")
-            return getApiService().getStories()
+            apiService.getStories()
         } catch (e: Exception) {
             Log.e("UserRepository", "Error getting stories: ${e.message}")
             throw e
@@ -54,7 +42,7 @@ class UserRepository private constructor(
     }
 
     suspend fun getStoryById(storyId: String): DetailResponse {
-        try {
+        return try {
             val user = userPreference.getSession().firstOrNull()
                 ?: throw NullPointerException("User session is null")
 
@@ -62,26 +50,15 @@ class UserRepository private constructor(
                 throw IllegalStateException("Token not found")
             }
 
-            return getApiService().getStoryById(storyId)
+            apiService.getStoryById(storyId)
         } catch (e: Exception) {
             Log.e("UserRepository", "Error getting story by id: ${e.message}")
             throw e
         }
     }
 
-    fun getSession(): Flow<UserModel> {
-        return userPreference.getSession()
-    }
-
-    suspend fun logout() {
-        Log.d("UserRepository", "Logging out user")
-        userPreference.logout()
-    }
-
     suspend fun register(name: String, email: String, password: String): String {
         return try {
-            // Untuk register, kita tidak perlu token
-            val apiService = ApiConfig.getApiService("")
             val response = apiService.register(name, email, password)
             response.message ?: "Registration successful"
         } catch (e: HttpException) {
@@ -92,16 +69,12 @@ class UserRepository private constructor(
     }
 
     suspend fun login(email: String, password: String): String {
-        try {
-            // Untuk login, kita tidak perlu token
-            val apiService = ApiConfig.getApiService("")
+        return try {
             val response = apiService.login(email, password)
             Log.d("UserRepository", "Login response: $response")
 
             val token = response.loginResult?.token
-            if (token.isNullOrEmpty()) {
-                throw Exception("Token not received from server")
-            }
+                ?: throw Exception("Token not received from server")
 
             val user = UserModel(
                 email = email,
@@ -113,13 +86,11 @@ class UserRepository private constructor(
             runBlocking {
                 userPreference.saveSession(user)
             }
-
-
             // Verifikasi session tersimpan
             val savedUser = userPreference.getSession().first()
             Log.d("UserRepository", "Verified saved session: $savedUser")
 
-            return response.message ?: "Login successful"
+            response.message ?: "Login successful"
         } catch (e: Exception) {
             Log.e("UserRepository", "Login error: ${e.message}")
             throw e
@@ -127,7 +98,7 @@ class UserRepository private constructor(
     }
 
     suspend fun uploadImage(multipartBody: MultipartBody.Part, requestBody: RequestBody): FileUploadResponse {
-        try {
+        return try {
             val user = userPreference.getSession().firstOrNull()
                 ?: throw NullPointerException("User session is null")
 
@@ -135,11 +106,18 @@ class UserRepository private constructor(
                 throw IllegalStateException("Token not found")
             }
 
-            return getApiService().uploadImage(multipartBody, requestBody)
+            apiService.uploadImage(multipartBody, requestBody)
         } catch (e: Exception) {
             Log.e("UserRepository", "Error uploading image: ${e.message}")
             throw e
         }
+    }
+
+    fun getSession(): Flow<UserModel> = userPreference.getSession()
+
+    suspend fun logout() {
+        Log.d("UserRepository", "Logging out user")
+        userPreference.logout()
     }
 
     companion object {
@@ -147,10 +125,12 @@ class UserRepository private constructor(
         private var instance: UserRepository? = null
 
         fun getInstance(
-            userPreference: UserPreference
-        ): UserRepository =
-            instance ?: synchronized(this) {
-                instance ?: UserRepository(userPreference)
+            userPreference: UserPreference,
+            apiService: ApiService
+        ): UserRepository {
+            return instance ?: synchronized(this) {
+                instance ?: UserRepository(userPreference, apiService)
             }.also { instance = it }
+        }
     }
 }
