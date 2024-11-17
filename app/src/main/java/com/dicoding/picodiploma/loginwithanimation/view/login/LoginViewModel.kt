@@ -1,15 +1,10 @@
 package com.dicoding.picodiploma.loginwithanimation.view.login
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dicoding.picodiploma.loginwithanimation.data.ErrorResponse
-import com.dicoding.picodiploma.loginwithanimation.data.LoginResponse
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
-import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first

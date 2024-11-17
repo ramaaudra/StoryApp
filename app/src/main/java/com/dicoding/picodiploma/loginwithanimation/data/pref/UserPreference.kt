@@ -19,8 +19,6 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
 
     suspend fun saveSession(user: UserModel) {
         Log.d("UserPreference", "Saving session called with user: $user")
-        Log.d("UserPreference", "Stack trace:", Exception("Stack trace"))
-
         dataStore.edit { preferences ->
             preferences[EMAIL_KEY] = user.email
             preferences[TOKEN_KEY] = user.token

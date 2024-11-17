@@ -116,7 +116,7 @@ class UploadActivity : AppCompatActivity() {
 
                 val userPreference = UserPreference.getInstance(dataStore)
                 val token = userPreference.getSession().first().token
-                viewModel.uploadImage(token, multipartBody, requestBody)
+                viewModel.uploadImage(multipartBody, requestBody)
             }
         } ?: showToast(getString(R.string.empty_image_warning))
     }

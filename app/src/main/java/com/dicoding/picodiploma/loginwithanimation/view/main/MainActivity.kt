@@ -1,21 +1,15 @@
 package com.dicoding.picodiploma.loginwithanimation.view.main
 
-import android.app.ProgressDialog.show
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.WindowInsets
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
@@ -46,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
 
         viewModel.getSession().observe(this) { user ->
-            Log.d("MainActivity", "Session observer triggered: $user")
+            Log.d("MainActivity", "Session observer triggered with token: ${user.token}")
             if (!user.isLogin || user.token.isEmpty()) {
                 Log.d("MainActivity", "Invalid session, redirecting to login")
                 startActivity(Intent(this, LoginActivity::class.java))
@@ -104,6 +98,7 @@ class MainActivity : AppCompatActivity() {
                         startActivity(Intent(this, LoginActivity::class.java))
                         finish()
                     } else {
+                        Log.e("MainActivity", "Error fetching stories: ${resultState.message}")
                         Toast.makeText(
                             this,
                             "Gagal memuat story, coba login kembali",

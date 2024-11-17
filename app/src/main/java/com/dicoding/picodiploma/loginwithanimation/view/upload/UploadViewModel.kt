@@ -18,14 +18,18 @@ class UploadViewModel(private val repository: UserRepository) : ViewModel() {
     private val _uploadState = MutableStateFlow<ResultState<FileUploadResponse>>(ResultState.Loading)
     val uploadState: StateFlow<ResultState<FileUploadResponse>> = _uploadState
 
-    fun uploadImage(token: String, multipartBody: MultipartBody.Part, requestBody: RequestBody) {
+    fun uploadImage(multipartBody: MultipartBody.Part, requestBody: RequestBody) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _uploadState.value = ResultState.Loading
-                val response = repository.uploadImage(token, multipartBody, requestBody)
+                val response = repository.uploadImage(multipartBody, requestBody)
                 _uploadState.value = ResultState.Success(response)
-            } catch (e: HttpException) {
-                _uploadState.value = ResultState.Error(e.message ?: "Unknown error")
+            } catch (e: Exception) {
+                val errorMessage = when (e) {
+                    is HttpException -> e.message ?: "Network error occurred"
+                    else -> e.message ?: "Unknown error occurred"
+                }
+                _uploadState.value = ResultState.Error(errorMessage)
             }
         }
     }

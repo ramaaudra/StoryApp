@@ -1,21 +1,17 @@
 package com.dicoding.picodiploma.loginwithanimation.view.login
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
-import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityLoginBinding
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.main.MainActivity
@@ -62,7 +58,9 @@ class LoginActivity : AppCompatActivity() {
                     is ResultState.Loading -> {}
                     is ResultState.Success -> {
                         showLoading(false)
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
                         finish()
                     }
                     is ResultState.Error -> {
