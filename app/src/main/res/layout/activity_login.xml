@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guidelineHorizontal2"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/image_welcome" />
+        app:srcCompat="@drawable/login" />
 
     <TextView
         android:id="@+id/titleTextView"
@@ -57,7 +57,7 @@
         android:text="@string/register"
         android:textAlignment="center"
         android:textColor="@color/navy"
-        android:textSize="12sp"
+        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="@+id/loginButton"
         app:layout_constraintStart_toStartOf="@+id/loginButton"
         app:layout_constraintTop_toBottomOf="@+id/loginButton" />
@@ -134,7 +134,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:backgroundTint="@color/navy"
+        android:backgroundTint="@color/primary"
         android:text="@string/login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -92,6 +92,12 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private fun uploadImage() {
+        val description = binding.edAddDescription.text.toString()
+        if (description.isEmpty()) {
+            showToast(getString(R.string.empty_description_warning))
+            return
+        }
+
         currentImageUri?.let { uri ->
             lifecycleScope.launch {
                 showLoading(true)
@@ -99,7 +105,6 @@ class UploadActivity : AppCompatActivity() {
                     uriToFile(uri, this@UploadActivity).reduceFileImage()
                 }
                 Log.d("Image File", "showImage: ${imageFile.path}")
-                val description = binding.edAddDescription.text.toString()
 
                 val requestBody = description.toRequestBody("text/plain".toMediaType())
                 val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())

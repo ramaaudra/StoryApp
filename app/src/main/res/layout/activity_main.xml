@@ -27,7 +27,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="StoryApp"
-        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,6 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
+        android:backgroundTint="@color/primary"
         android:contentDescription="@string/add_story"
         android:src="@drawable/ic_add_fab"
         app:layout_constraintBottom_toBottomOf="parent"

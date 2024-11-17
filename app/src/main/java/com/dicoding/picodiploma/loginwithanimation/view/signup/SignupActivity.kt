@@ -1,5 +1,6 @@
 package com.dicoding.picodiploma.loginwithanimation.view.signup
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -20,6 +21,8 @@ import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivitySignupBinding
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
+import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
+import com.dicoding.picodiploma.loginwithanimation.view.main.MainActivity
 import kotlinx.coroutines.launch
 
 class SignupActivity : AppCompatActivity() {
@@ -43,11 +46,13 @@ class SignupActivity : AppCompatActivity() {
         }
 
         binding.signupButton.setOnClickListener {
-            val name = binding.nameEditText.text.toString()
-            val email = binding.emailEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
-            showLoading(true)
-            registerViewModel.register(name, email, password)
+            if (validateFields()) {
+                val name = binding.nameEditText.text.toString()
+                val email = binding.emailEditText.text.toString()
+                val password = binding.passwordEditText.text.toString()
+                showLoading(true)
+                registerViewModel.register(name, email, password)
+            }
         }
 
         lifecycleScope.launch {
@@ -58,6 +63,10 @@ class SignupActivity : AppCompatActivity() {
                     is ResultState.Success -> {
                         showLoading(false)
                         Toast.makeText(this@SignupActivity, state.data, Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@SignupActivity, LoginActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                        finish()
                     }
 
                     is ResultState.Error -> {
@@ -68,6 +77,32 @@ class SignupActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun validateFields(): Boolean {
+        val name = binding.nameEditText.text.toString()
+        val email = binding.emailEditText.text.toString()
+        val password = binding.passwordEditText.text.toString()
+
+        return when {
+            name.isEmpty() -> {
+                showToast(getString(R.string.empty_name_warning))
+                false
+            }
+            email.isEmpty() -> {
+                showToast(getString(R.string.empty_email_warning))
+                false
+            }
+            password.isEmpty() -> {
+                showToast(getString(R.string.empty_password_warning))
+                false
+            }
+            else -> true
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun showLoading(isLoading: Boolean) {

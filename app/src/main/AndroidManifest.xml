@@ -23,9 +23,6 @@
             android:name=".view.detail.DetailActivity"
             android:exported="false" />
         <activity
-            android:name=".view.welcome.WelcomeActivity"
-            android:exported="false" />
-        <activity
             android:name=".view.signup.SignupActivity"
             android:exported="false" />
         <activity

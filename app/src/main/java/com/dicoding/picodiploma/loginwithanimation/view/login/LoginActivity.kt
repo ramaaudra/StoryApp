@@ -47,10 +47,12 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupAction() {
         binding.loginButton.setOnClickListener {
-            val email = binding.emailEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
-            showLoading(true)
-            viewModel.login(email, password)
+            if (validateFields()) {
+                val email = binding.emailEditText.text.toString()
+                val password = binding.passwordEditText.text.toString()
+                showLoading(true)
+                viewModel.login(email, password)
+            }
         }
 
 
@@ -78,6 +80,28 @@ class LoginActivity : AppCompatActivity() {
         binding.registerButton.setOnClickListener {
             startActivity(Intent(this, SignupActivity::class.java))
         }
+    }
+
+    private fun validateFields(): Boolean {
+        val email = binding.emailEditText.text.toString()
+        val password = binding.passwordEditText.text.toString()
+
+        return when {
+            email.isEmpty() -> {
+                showToast(getString(R.string.empty_email_warning))
+                false
+            }
+            password.isEmpty() -> {
+                showToast(getString(R.string.empty_password_warning))
+                false
+            }
+            else -> true
+        }
+    }
+
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun showLoading(isLoading: Boolean) {
