@@ -8,8 +8,10 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,7 @@ import com.dicoding.picodiploma.loginwithanimation.data.ResultState
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityMainBinding
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
+import com.dicoding.picodiploma.loginwithanimation.view.upload.UploadActivity
 import com.dicoding.picodiploma.loginwithanimation.view.welcome.WelcomeActivity
 
 class MainActivity : AppCompatActivity() {
@@ -31,7 +34,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        enableEdgeToEdge()
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainView)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
 
         viewModel.getSession().observe(this) { user ->
@@ -49,14 +59,24 @@ class MainActivity : AppCompatActivity() {
         observeStories()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getStories()
+    }
+
+
     private fun setupAction() {
         binding.fabAdd.setOnClickListener {
+            startActivity(Intent(this, UploadActivity::class.java))
+        }
+
+        binding.btnLogIut.setOnClickListener {
             viewModel.logout()
         }
     }
 
     private fun setupRecyclerView() {
-        mainAdapter = MainAdapter(emptyList())
+        mainAdapter = MainAdapter()
         binding.rvStory.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = mainAdapter
@@ -72,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 is ResultState.Success -> {
                     showLoading(false)
-                    mainAdapter.updateData(resultState.data.listStory)
+                    mainAdapter.submitList(resultState.data.listStory)
                 }
                 is ResultState.Error -> {
                     showLoading(false)

@@ -1,7 +1,9 @@
 package com.dicoding.picodiploma.loginwithanimation.data.api
 
 import android.util.Log
+import com.dicoding.picodiploma.loginwithanimation.data.DetailResponse
 import com.dicoding.picodiploma.loginwithanimation.data.ErrorResponse
+import com.dicoding.picodiploma.loginwithanimation.data.FileUploadResponse
 import com.dicoding.picodiploma.loginwithanimation.data.LoginResponse
 import com.dicoding.picodiploma.loginwithanimation.data.RegisterResponse
 import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
@@ -11,6 +13,8 @@ import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.HttpException
 
 class UserRepository private constructor(
@@ -24,6 +28,14 @@ class UserRepository private constructor(
             userPreference.getSession().firstOrNull()?.token
                 ?: throw NullPointerException("Token is null")
             return apiService.getStories()
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun getStoryById(storyId: String): DetailResponse {
+        try {
+            return apiService.getStoryById(storyId)
         } catch (e: Exception) {
             throw e
         }
@@ -77,6 +89,10 @@ class UserRepository private constructor(
             Log.e("UserRepository", "Login error: ${e.message}")
             throw e
         }
+    }
+
+    suspend fun uploadImage(token: String, multipartBody: MultipartBody.Part, requestBody: RequestBody): FileUploadResponse {
+        return apiService.uploadImage(multipartBody, requestBody)
     }
 
 

@@ -17,5 +17,11 @@
     <string name="add_story">add story</string>
     <string name="description">Deskripsi</string>
     <string name="list_item_photo">list item photo</string>
+    <string name="story_image">image story</string>
+    <string name="photo">"foto "</string>
+    <string name="gallery">galeri</string>
+    <string name="camera">camera</string>
+    <string name="upload">upload</string>
+    <string name="empty_image_warning">Empty Image</string>
 
 </resources>

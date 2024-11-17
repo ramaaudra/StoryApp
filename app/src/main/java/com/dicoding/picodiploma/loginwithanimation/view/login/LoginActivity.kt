@@ -26,6 +26,7 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel by viewModels<LoginViewModel> {
         ViewModelFactory.getInstance(this)
     }
+
     private lateinit var binding: ActivityLoginBinding
     private var isLoading = false
 
@@ -34,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.loginView)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -73,7 +74,6 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
-
 
         binding.registerButton.setOnClickListener {
             startActivity(Intent(this, SignupActivity::class.java))
