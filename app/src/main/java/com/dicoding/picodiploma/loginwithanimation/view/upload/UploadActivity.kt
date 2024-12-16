@@ -54,6 +54,7 @@ class UploadActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         binding.galleryButton.setOnClickListener { startGallery() }
         binding.cameraButton.setOnClickListener { startCamera() }
         binding.buttonAdd.setOnClickListener { uploadImage() }
@@ -114,8 +115,8 @@ class UploadActivity : AppCompatActivity() {
                     requestImageFile
                 )
 
-                val userPreference = UserPreference.getInstance(dataStore)
-                val token = userPreference.getSession().first().token
+//                val userPreference = UserPreference.getInstance(dataStore)
+//                val token = userPreference.getSession().first().token
                 viewModel.uploadImage(multipartBody, requestBody)
             }
         } ?: showToast(getString(R.string.empty_image_warning))

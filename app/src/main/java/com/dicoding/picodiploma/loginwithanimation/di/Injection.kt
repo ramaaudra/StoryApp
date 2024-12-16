@@ -2,6 +2,7 @@ package com.dicoding.picodiploma.loginwithanimation.di
 
 import android.content.Context
 import com.dicoding.picodiploma.loginwithanimation.data.api.ApiConfig
+import com.dicoding.picodiploma.loginwithanimation.data.api.LocationRepository
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.dicoding.picodiploma.loginwithanimation.data.pref.dataStore
@@ -12,5 +13,12 @@ object Injection {
     fun provideRepository(context: Context): UserRepository {
         val pref = UserPreference.getInstance(context.dataStore)
         return UserRepository.getInstance(pref)
+    }
+
+    fun provideLocationRepository(context: Context): LocationRepository {
+        val pref = UserPreference.getInstance(context.dataStore)
+        val user = runBlocking { pref.getSession().first() }
+        val apiService = ApiConfig.getApiService(user.token)
+        return LocationRepository.getInstance(apiService, pref)
     }
 }

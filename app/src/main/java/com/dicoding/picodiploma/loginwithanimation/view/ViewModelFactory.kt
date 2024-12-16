@@ -3,19 +3,23 @@ package com.dicoding.picodiploma.loginwithanimation.view
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.dicoding.picodiploma.loginwithanimation.data.api.ApiService
+import com.dicoding.picodiploma.loginwithanimation.data.api.LocationRepository
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.dicoding.picodiploma.loginwithanimation.data.pref.dataStore
 import com.dicoding.picodiploma.loginwithanimation.di.Injection
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginViewModel
 import com.dicoding.picodiploma.loginwithanimation.view.main.MainViewModel
+import com.dicoding.picodiploma.loginwithanimation.view.main.MapsViewModel
 import com.dicoding.picodiploma.loginwithanimation.view.signup.RegisterViewModel
 import com.dicoding.picodiploma.loginwithanimation.view.upload.UploadViewModel
 
 
 
 class ViewModelFactory private constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
+    private val location: LocationRepository
 ) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
@@ -33,6 +37,9 @@ class ViewModelFactory private constructor(
             modelClass.isAssignableFrom(UploadViewModel::class.java) -> {
                 UploadViewModel(repository) as T
             }
+            modelClass.isAssignableFrom(MapsViewModel::class.java) -> {
+                MapsViewModel(location) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }
@@ -41,15 +48,21 @@ class ViewModelFactory private constructor(
         @Volatile
         private var INSTANCE: ViewModelFactory? = null
 
-        fun getInstance(context: Context): ViewModelFactory {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: ViewModelFactory(
-                    Injection.provideRepository(context)
-                ).also { INSTANCE = it }
+        @JvmStatic
+        fun getInstance(context: Context,): ViewModelFactory {
+            clearInstance()
+
+            synchronized(ViewModelFactory::class.java) {
+                val userRepository = Injection.provideRepository(context)
+                val locationRepository = Injection.provideLocationRepository(context)
+                INSTANCE = ViewModelFactory(userRepository, locationRepository)
             }
+
+            return INSTANCE as ViewModelFactory
         }
 
-        fun destroyInstance() {
+        @JvmStatic
+        private fun clearInstance() {
             INSTANCE = null
         }
     }

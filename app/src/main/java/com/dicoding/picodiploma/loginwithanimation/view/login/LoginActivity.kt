@@ -2,6 +2,7 @@ package com.dicoding.picodiploma.loginwithanimation.view.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -10,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityLoginBinding
@@ -18,7 +18,9 @@ import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.main.MainActivity
 import com.dicoding.picodiploma.loginwithanimation.view.signup.SignupActivity
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class LoginActivity : AppCompatActivity() {
     private val viewModel by viewModels<LoginViewModel> {
@@ -31,18 +33,37 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+
+        // Mengecek status login user pada saat activity dimulai
+        checkLoginStatus()
+    }
+
+    private fun checkLoginStatus() {
+        runBlocking {
+            val user = viewModel.getSessionUser().firstOrNull()
+            if (user != null && user.token.isNotEmpty()) {
+                Log.d("LoginActivity", "User token: ${user.token}")
+                // If the user is already logged in, navigate to MainActivity
+                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                finish()  // Stop LoginActivity
+            } else {
+                // If not logged in, set the content view to show the login screen
+                binding = ActivityLoginBinding.inflate(layoutInflater)
+                setContentView(binding.root)
+                setupAction()
+            }
+        }
+    }
+
+    private fun setupAction() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.loginView)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        setupAction()
-    }
-
-    private fun setupAction() {
         binding.loginButton.setOnClickListener {
             if (validateFields()) {
                 val email = binding.emailEditText.text.toString()

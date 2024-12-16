@@ -1,11 +1,20 @@
 package com.dicoding.picodiploma.loginwithanimation.data.api
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.liveData
 import com.dicoding.picodiploma.loginwithanimation.data.DetailResponse
 import com.dicoding.picodiploma.loginwithanimation.data.ErrorResponse
 import com.dicoding.picodiploma.loginwithanimation.data.FileUploadResponse
+import com.dicoding.picodiploma.loginwithanimation.data.ListStoryItem
 import com.dicoding.picodiploma.loginwithanimation.data.LoginResponse
 import com.dicoding.picodiploma.loginwithanimation.data.RegisterResponse
+import com.dicoding.picodiploma.loginwithanimation.data.StoryPagingSource
 import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
@@ -28,7 +37,10 @@ class UserRepository private constructor(
     // Helper function untuk mendapatkan ApiService dengan token yang benar
     private suspend fun getApiService(): ApiService {
         if (apiService == null) {
-            val user = userPreference.getSession().first()
+            val user = userPreference.getSession().firstOrNull() ?: throw Exception("User not logged in")
+            if (user.token.isEmpty()) {
+                throw Exception("Token is empty")
+            }
             apiService = ApiConfig.getApiService(user.token)
         }
         return apiService!!
@@ -43,6 +55,22 @@ class UserRepository private constructor(
             Log.e("UserRepository", "Error getting stories: ${e.message}")
             throw e
         }
+    }
+
+    fun getStoryPager(): LiveData<PagingData<ListStoryItem>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,  // Number of items per page
+                enablePlaceholders = false  // To improve performance, you can set this to false
+            ),
+            pagingSourceFactory = {
+                // Create a new instance of StoryPagingSource and pass the ApiService
+                val apiService = runBlocking {
+                    getApiService()
+                }
+                StoryPagingSource(apiService)  // Ensure getApiService() works correctly
+            }
+        ).liveData
     }
 
     suspend fun getStoryById(storyId: String): DetailResponse {

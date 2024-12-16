@@ -16,9 +16,10 @@ import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ListStoryItem
 import com.dicoding.picodiploma.loginwithanimation.view.detail.DetailActivity
 import androidx.core.util.Pair
+import androidx.paging.PagingDataAdapter
 
 
-class MainAdapter : ListAdapter<ListStoryItem, MainAdapter.StoryViewHolder>(DIFF_CALLBACK) {
+class MainAdapter : PagingDataAdapter<ListStoryItem, MainAdapter.StoryViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.story_item, parent, false)
@@ -26,8 +27,7 @@ class MainAdapter : ListAdapter<ListStoryItem, MainAdapter.StoryViewHolder>(DIFF
     }
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
-        val story = getItem(position)
-        holder.bind(story)
+        getItem(position)?.let { holder.bind(it) }
     }
 
     class StoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

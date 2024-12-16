@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
@@ -18,6 +19,7 @@ import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityMainBindi
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
 import com.dicoding.picodiploma.loginwithanimation.view.upload.UploadActivity
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainViewModel> {
@@ -25,7 +27,6 @@ class MainActivity : AppCompatActivity() {
     }
     private lateinit var binding: ActivityMainBinding
     private lateinit var mainAdapter: MainAdapter
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,13 +40,11 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-
         viewModel.getSession().observe(this) { user ->
             if (user.token.isEmpty()) {
                 startActivity(Intent(this, LoginActivity::class.java))
                 finish()
             } else {
-                // Pastikan ApiService menggunakan token yang benar
                 ApiConfig.updateApiService(user.token)
                 viewModel.getStories()
             }
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.getStories()
     }
 
-
     private fun setupAction() {
         binding.fabAdd.setOnClickListener {
             startActivity(Intent(this, UploadActivity::class.java))
@@ -70,49 +68,25 @@ class MainActivity : AppCompatActivity() {
         binding.btnLogIut.setOnClickListener {
             viewModel.logout()
         }
+
+        binding.btnMaps.setOnClickListener {
+            startActivity(Intent(this, MapsActivity::class.java))
+        }
     }
 
     private fun setupRecyclerView() {
         mainAdapter = MainAdapter()
-        binding.rvStory.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = mainAdapter
-        }
+        binding.rvStory.layoutManager = LinearLayoutManager(this)
+        binding.rvStory.adapter = mainAdapter
     }
 
-
     private fun observeStories() {
-        viewModel.stories.observe(this) { resultState ->
-            when (resultState) {
-                is ResultState.Loading -> {
-                    showLoading(true)
-                }
-                is ResultState.Success -> {
-                    showLoading(false)
-                    mainAdapter.submitList(resultState.data.listStory)
-                }
-                is ResultState.Error -> {
-                    showLoading(false)
-                    // Check if token not found
-                    if (resultState.message.contains("Token not found")) {
-                        // Redirect ke login
-                        viewModel.logout()
-                        startActivity(Intent(this, LoginActivity::class.java))
-                        finish()
-                    } else {
-                        Log.e("MainActivity", "Error fetching stories: ${resultState.message}")
-                        Toast.makeText(
-                            this,
-                            "Gagal memuat story, coba login kembali",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+        viewModel.getStoryPager().observe(this) { pagingData ->
+            lifecycleScope.launch {
+                mainAdapter.submitData(pagingData)
             }
         }
     }
-
-
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE

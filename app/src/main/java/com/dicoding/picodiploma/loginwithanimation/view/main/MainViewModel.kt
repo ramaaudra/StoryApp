@@ -6,7 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.dicoding.picodiploma.loginwithanimation.data.DetailResponse
+import com.dicoding.picodiploma.loginwithanimation.data.ListStoryItem
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
 import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
@@ -56,5 +59,9 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
                 _story.value = ResultState.Error(e.message ?: "Unknown error")
             }
         }
+    }
+
+    fun getStoryPager(): LiveData<PagingData<ListStoryItem>> {
+        return repository.getStoryPager().cachedIn(viewModelScope)
     }
 }
