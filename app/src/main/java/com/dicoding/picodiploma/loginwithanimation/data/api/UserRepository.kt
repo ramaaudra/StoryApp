@@ -2,25 +2,21 @@ package com.dicoding.picodiploma.loginwithanimation.data.api
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import androidx.paging.liveData
 import com.dicoding.picodiploma.loginwithanimation.data.DetailResponse
 import com.dicoding.picodiploma.loginwithanimation.data.ErrorResponse
 import com.dicoding.picodiploma.loginwithanimation.data.FileUploadResponse
 import com.dicoding.picodiploma.loginwithanimation.data.ListStoryItem
-import com.dicoding.picodiploma.loginwithanimation.data.LoginResponse
-import com.dicoding.picodiploma.loginwithanimation.data.RegisterResponse
-import com.dicoding.picodiploma.loginwithanimation.data.StoryPagingSource
+import com.dicoding.picodiploma.loginwithanimation.data.pager.StoryPagingSource
 import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.MultipartBody
@@ -29,21 +25,22 @@ import retrofit2.HttpException
 
 
 class UserRepository private constructor(
-    private val userPreference: UserPreference
+    private val userPreference: UserPreference,
+    private val apiService: ApiService
 ) {
-    // Cache untuk ApiService dengan token terbaru
-    private var apiService: ApiService? = null
+    // Cache for ApiService with the latest token
+    private var cachedApiService: ApiService? = null
 
-    // Helper function untuk mendapatkan ApiService dengan token yang benar
+    // Helper function to get ApiService with the correct token
     private suspend fun getApiService(): ApiService {
-        if (apiService == null) {
+        if (cachedApiService == null) {
             val user = userPreference.getSession().firstOrNull() ?: throw Exception("User not logged in")
             if (user.token.isEmpty()) {
                 throw Exception("Token is empty")
             }
-            apiService = ApiConfig.getApiService(user.token)
+            cachedApiService = ApiConfig.getApiService(user.token)
         }
-        return apiService!!
+        return cachedApiService!!
     }
 
     suspend fun getStories(): StoryResponse {
@@ -58,17 +55,17 @@ class UserRepository private constructor(
     }
 
     fun getStoryPager(): LiveData<PagingData<ListStoryItem>> {
+        @OptIn(ExperimentalPagingApi::class)
         return Pager(
             config = PagingConfig(
                 pageSize = 10,  // Number of items per page
                 enablePlaceholders = false  // To improve performance, you can set this to false
             ),
+//            remoteMediator = StoryRemoteMediator(storyDatabase, apiService),
             pagingSourceFactory = {
                 // Create a new instance of StoryPagingSource and pass the ApiService
-                val apiService = runBlocking {
-                    getApiService()
-                }
-                StoryPagingSource(apiService)  // Ensure getApiService() works correctly
+                StoryPagingSource(apiService)
+//                storyDatabase.storyDao().getAllStory()
             }
         ).liveData
     }
@@ -116,7 +113,7 @@ class UserRepository private constructor(
                 userPreference.saveSession(user)
             }
 
-            // Perbarui ApiService dengan token baru
+            // Update ApiService with the new token
             updateApiService(token)
 
             response.message ?: "Login successful"
@@ -127,7 +124,7 @@ class UserRepository private constructor(
     }
 
     private fun updateApiService(token: String) {
-        apiService = ApiConfig.getApiService(token)
+        cachedApiService = ApiConfig.getApiService(token)
     }
 
     suspend fun uploadImage(
@@ -149,16 +146,16 @@ class UserRepository private constructor(
     suspend fun logout() {
         Log.d("UserRepository", "Logging out user")
         userPreference.logout()
-        apiService = null // Reset ApiService agar tidak menggunakan token lama
+        cachedApiService = null // Reset ApiService to avoid using the old token
     }
 
     companion object {
         @Volatile
         private var instance: UserRepository? = null
 
-        fun getInstance(userPreference: UserPreference): UserRepository {
+        fun getInstance(userPreference: UserPreference, apiService: ApiService): UserRepository {
             return instance ?: synchronized(this) {
-                instance ?: UserRepository(userPreference)
+                instance ?: UserRepository(userPreference, apiService)
             }.also { instance = it }
         }
     }

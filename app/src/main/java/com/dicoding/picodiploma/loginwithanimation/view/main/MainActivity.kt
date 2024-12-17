@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
 import com.dicoding.picodiploma.loginwithanimation.data.api.ApiConfig
+import com.dicoding.picodiploma.loginwithanimation.data.pager.LoadingStateAdapter
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityMainBinding
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
@@ -77,7 +78,11 @@ class MainActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         mainAdapter = MainAdapter()
         binding.rvStory.layoutManager = LinearLayoutManager(this)
-        binding.rvStory.adapter = mainAdapter
+        binding.rvStory.adapter = mainAdapter.withLoadStateFooter(
+                footer = LoadingStateAdapter {
+                    mainAdapter.retry()
+                }
+        )
     }
 
     private fun observeStories() {
