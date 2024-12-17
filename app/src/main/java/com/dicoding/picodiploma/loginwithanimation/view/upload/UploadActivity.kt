@@ -139,6 +139,10 @@ class UploadActivity : AppCompatActivity() {
                         showLoading(false)
                         showToast(state.message)
                     }
+
+                    ResultState.Finished -> {
+                        showLoading(false)
+                    }
                 }
             }
         }

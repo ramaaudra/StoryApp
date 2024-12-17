@@ -53,7 +53,9 @@ class DetailActivity : AppCompatActivity() {
                     showLoading(false)
                     Log.e("DetailActivity", "Error fetching story: ${resultState.message}")
                 }
-            }
+                is ResultState.Finished -> {
+                    showLoading(false)
+                }            }
         })
     }
 

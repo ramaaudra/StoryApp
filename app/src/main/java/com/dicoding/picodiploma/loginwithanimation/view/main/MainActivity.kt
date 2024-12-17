@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getStories()
+        viewModel.getStoryPager()
     }
 
     private fun setupAction() {
@@ -88,12 +89,48 @@ class MainActivity : AppCompatActivity() {
     private fun observeStories() {
         viewModel.getStoryPager().observe(this) { pagingData ->
             lifecycleScope.launch {
+                // Menyampaikan data paginasi ke adapter
                 mainAdapter.submitData(pagingData)
+            }
+        }
+
+        // Mengamati perubahan load state (misalnya error, loading, empty) pada adapter
+        mainAdapter.addLoadStateListener { loadState ->
+            when (loadState.refresh) {
+                is LoadState.Loading -> {
+                    showLoading(true)
+                    showError(false)
+                    showEmpty(false)
+                }
+                is LoadState.Error -> {
+                    showLoading(false)
+                    showError(true,  "Terjadi kesalahan.")
+                    showEmpty(false)
+                }
+                is LoadState.NotLoading -> {
+                    showLoading(false)
+                    if (loadState.append.endOfPaginationReached) {
+                        showEmpty(true)
+                    }
+                    showError(false)
+                }
             }
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    private fun showError(isError: Boolean, message: String = "") {
+        if (isError) {
+            Toast.makeText(this, "Error: $message", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showEmpty(isEmpty: Boolean) {
+        if (isEmpty) {
+            Toast.makeText(this, "Tidak ada data tersedia", Toast.LENGTH_SHORT).show()
+        }
     }
 }

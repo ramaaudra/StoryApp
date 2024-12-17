@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dicoding.picodiploma.loginwithanimation.R
@@ -40,6 +39,7 @@ class MainAdapter : PagingDataAdapter<ListStoryItem, MainAdapter.StoryViewHolder
             tvDescription.text = story.description
             Glide.with(itemView.context)
                 .load(story.photoUrl)
+                .placeholder(R.drawable.loading_placeholder )
                 .into(imgPhoto)
 
             itemView.setOnClickListener {

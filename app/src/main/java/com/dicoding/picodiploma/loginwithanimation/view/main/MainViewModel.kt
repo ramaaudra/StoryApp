@@ -11,6 +11,7 @@ import androidx.paging.cachedIn
 import com.dicoding.picodiploma.loginwithanimation.data.DetailResponse
 import com.dicoding.picodiploma.loginwithanimation.data.ListStoryItem
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
+import com.dicoding.picodiploma.loginwithanimation.data.Story
 import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
@@ -23,6 +24,9 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
 
     private val _story = MutableLiveData<ResultState<DetailResponse>>()
     val story: LiveData<ResultState<DetailResponse>> = _story
+
+    private val _storyResultState = MutableLiveData<ResultState<PagingData<Story>>>()
+    val storyResultState: LiveData<ResultState<PagingData<Story>>> = _storyResultState
 
     fun getSession(): LiveData<UserModel> {
         return repository.getSession().asLiveData()

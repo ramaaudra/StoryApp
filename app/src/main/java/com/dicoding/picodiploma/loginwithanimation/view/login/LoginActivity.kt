@@ -93,6 +93,8 @@ class LoginActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+
+                    ResultState.Finished -> showLoading(false)
                 }
             }
         }

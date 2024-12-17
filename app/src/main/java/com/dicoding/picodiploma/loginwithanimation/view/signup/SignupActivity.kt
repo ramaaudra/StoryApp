@@ -74,6 +74,8 @@ class SignupActivity : AppCompatActivity() {
                         Toast.makeText(this@SignupActivity, state.message, Toast.LENGTH_SHORT)
                             .show()
                     }
+
+                    ResultState.Finished -> showLoading(false)
                 }
             }
         }
