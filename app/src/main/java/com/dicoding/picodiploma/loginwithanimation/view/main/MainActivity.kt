@@ -21,6 +21,7 @@ import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityMainBindi
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
 import com.dicoding.picodiploma.loginwithanimation.view.upload.UploadActivity
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -48,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                 finish()
             } else {
                 ApiConfig.updateApiService(user.token)
-                viewModel.getStories()
+                viewModel.getStoryPager()
             }
         }
 
@@ -87,14 +88,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeStories() {
-        viewModel.getStoryPager().observe(this) { pagingData ->
-            lifecycleScope.launch {
-                // Menyampaikan data paginasi ke adapter
+        lifecycleScope.launch {
+            viewModel.getStoryPager().collectLatest { pagingData ->
                 mainAdapter.submitData(pagingData)
             }
         }
 
-        // Mengamati perubahan load state (misalnya error, loading, empty) pada adapter
         mainAdapter.addLoadStateListener { loadState ->
             when (loadState.refresh) {
                 is LoadState.Loading -> {
@@ -104,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 is LoadState.Error -> {
                     showLoading(false)
-                    showError(true,  "Terjadi kesalahan.")
+                    showError(true, "Terjadi kesalahan.")
                     showEmpty(false)
                 }
                 is LoadState.NotLoading -> {

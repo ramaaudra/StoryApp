@@ -21,11 +21,12 @@ playServicesMaps = "19.0.0"
 pagingRuntimeKtx = "3.3.5"
 coreTesting = "2.1.0"
 kotlinxCoroutinesTest = "1.6.1"
-mockitoCore = "4.4.0"
-mockitoInline = "4.4.0"
+mockitoCore = "5.14.2"
+mockitoInline = "5.2.0"
 roomPaging = "2.6.1"
 roomKtx = "2.6.1"
 roomCompiler = "2.6.1"
+junitJunit = "4.12"
 
 
 [libraries]
@@ -57,6 +58,7 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomPaging" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 
 [plugins]
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

@@ -43,18 +43,18 @@ class UserRepository private constructor(
         return cachedApiService!!
     }
 
-    suspend fun getStories(): StoryResponse {
-        return try {
-            Log.d("UserRepository", "Fetching stories...")
-            val service = getApiService()
-            service.getStories()
-        } catch (e: Exception) {
-            Log.e("UserRepository", "Error getting stories: ${e.message}")
-            throw e
-        }
-    }
+//    suspend fun getStories(): StoryResponse {
+//        return try {
+//            Log.d("UserRepository", "Fetching stories...")
+//            val service = getApiService()
+//            service.getStories()
+//        } catch (e: Exception) {
+//            Log.e("UserRepository", "Error getting stories: ${e.message}")
+//            throw e
+//        }
+//    }
 
-    fun getStoryPager(): LiveData<PagingData<ListStoryItem>> {
+    fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
         @OptIn(ExperimentalPagingApi::class)
         return Pager(
             config = PagingConfig(
@@ -67,7 +67,7 @@ class UserRepository private constructor(
                 StoryPagingSource(apiService)
 //                storyDatabase.storyDao().getAllStory()
             }
-        ).liveData
+        ).flow
     }
 
     suspend fun getStoryById(storyId: String): DetailResponse {

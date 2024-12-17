@@ -15,6 +15,8 @@ import com.dicoding.picodiploma.loginwithanimation.data.Story
 import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
+import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -25,8 +27,8 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
     private val _story = MutableLiveData<ResultState<DetailResponse>>()
     val story: LiveData<ResultState<DetailResponse>> = _story
 
-    private val _storyResultState = MutableLiveData<ResultState<PagingData<Story>>>()
-    val storyResultState: LiveData<ResultState<PagingData<Story>>> = _storyResultState
+    private val _storyResultState = MutableLiveData<ResultState<PagingData<ListStoryItem>>>()
+    val storyResultState: LiveData<ResultState<PagingData<ListStoryItem>>> = _storyResultState
 
     fun getSession(): LiveData<UserModel> {
         return repository.getSession().asLiveData()
@@ -39,18 +41,18 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
     }
 
 
-    fun getStories() {
-        viewModelScope.launch {
-            try {
-                _stories.value = ResultState.Loading
-                val response = repository.getStories()
-                _stories.value = ResultState.Success(response)
-            } catch (e: Exception) {
-                android.util.Log.e("MainViewModel", "Error: ${e.message}", e)
-                _stories.value = ResultState.Error(e.message ?: "Unknown error")
-            }
-        }
-    }
+//    fun getStories() {
+//        viewModelScope.launch {
+//            try {
+//                _stories.value = ResultState.Loading
+//                val response = repository.getStories()
+//                _stories.value = ResultState.Success(response)
+//            } catch (e: Exception) {
+//                android.util.Log.e("MainViewModel", "Error: ${e.message}", e)
+//                _stories.value = ResultState.Error(e.message ?: "Unknown error")
+//            }
+//        }
+//    }
 
     fun getStoryById(storyId: String) {
         viewModelScope.launch {
@@ -65,7 +67,7 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 
-    fun getStoryPager(): LiveData<PagingData<ListStoryItem>> {
-        return repository.getStoryPager().cachedIn(viewModelScope)
+    fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
+        return repository.getStoryPager()
     }
 }
