@@ -2,7 +2,6 @@ package com.dicoding.picodiploma.loginwithanimation.view.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dicoding.picodiploma.loginwithanimation.data.RegisterResponse
 import com.dicoding.picodiploma.loginwithanimation.data.ResultState
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow

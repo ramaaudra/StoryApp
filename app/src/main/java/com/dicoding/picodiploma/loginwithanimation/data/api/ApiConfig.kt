@@ -48,8 +48,4 @@ object ApiConfig {
     fun updateApiService(token: String) {
         apiService = getApiService(token)
     }
-
-    fun getCachedApiService(): ApiService? {
-        return apiService
-    }
 }

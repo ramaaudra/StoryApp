@@ -3,18 +3,14 @@ package com.dicoding.picodiploma.loginwithanimation.view
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.dicoding.picodiploma.loginwithanimation.data.api.ApiService
 import com.dicoding.picodiploma.loginwithanimation.data.api.LocationRepository
 import com.dicoding.picodiploma.loginwithanimation.data.api.UserRepository
-import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
-import com.dicoding.picodiploma.loginwithanimation.data.pref.dataStore
 import com.dicoding.picodiploma.loginwithanimation.di.Injection
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginViewModel
 import com.dicoding.picodiploma.loginwithanimation.view.main.MainViewModel
 import com.dicoding.picodiploma.loginwithanimation.view.main.MapsViewModel
 import com.dicoding.picodiploma.loginwithanimation.view.signup.RegisterViewModel
 import com.dicoding.picodiploma.loginwithanimation.view.upload.UploadViewModel
-
 
 
 class ViewModelFactory private constructor(

@@ -39,7 +39,7 @@ class MainAdapter : PagingDataAdapter<ListStoryItem, MainAdapter.StoryViewHolder
             tvDescription.text = story.description
             Glide.with(itemView.context)
                 .load(story.photoUrl)
-                .placeholder(R.drawable.loading_placeholder )
+                .placeholder(R.drawable.ic_place_holder )
                 .into(imgPhoto)
 
             itemView.setOnClickListener {

@@ -1,7 +1,6 @@
 package com.dicoding.picodiploma.loginwithanimation
 
 import com.dicoding.picodiploma.loginwithanimation.data.ListStoryItem
-import com.dicoding.picodiploma.loginwithanimation.data.StoryResponse
 
 object DataDummy {
 

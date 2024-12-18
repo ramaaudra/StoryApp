@@ -1,12 +1,6 @@
 package com.dicoding.picodiploma.loginwithanimation.data
 
-import android.os.Parcelable
-import androidx.annotation.NonNull
-import androidx.datastore.preferences.protobuf.Internal.DoubleList
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
 
 data class StoryResponse(
