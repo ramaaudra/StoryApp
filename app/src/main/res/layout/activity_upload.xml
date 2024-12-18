@@ -5,7 +5,7 @@
     android:id="@+id/UploadView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="@color/bg_white"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,16 +23,39 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/create_story"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button_add"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/button_add" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch1"
+            android:layout_width="210dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/bagikan_lokasimu"
+            app:thumbTint="@color/primary"
+            app:layout_constraintEnd_toEndOf="@+id/ed_add_description"
+            app:layout_constraintTop_toBottomOf="@+id/previewImageView" />
+
         <ImageView
             android:id="@+id/previewImageView"
             android:layout_width="0dp"
-            android:layout_height="350dp"
+            android:layout_height="300dp"
             android:layout_margin="16dp"
+            android:layout_marginTop="8dp"
             android:contentDescription="@string/photo"
             android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/progressIndicator"
+            app:layout_constraintTop_toBottomOf="@+id/ed_add_description"
             app:srcCompat="@drawable/ic_place_holder" />
 
         <Button
@@ -40,7 +63,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:backgroundTint="@color/primary"
             android:text="@string/gallery"
@@ -49,14 +72,14 @@
             app:cornerRadius="8dp"
             app:layout_constraintEnd_toStartOf="@id/cameraButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/previewImageView" />
+            app:layout_constraintTop_toBottomOf="@+id/switch1" />
 
         <Button
             android:id="@+id/cameraButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:backgroundTint="@color/primary"
             android:text="@string/camera"
@@ -65,41 +88,40 @@
             app:cornerRadius="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/galleryButton"
-            app:layout_constraintTop_toBottomOf="@id/previewImageView" />
+            app:layout_constraintTop_toBottomOf="@+id/switch1" />
 
         <EditText
             android:id="@+id/ed_add_description"
             android:layout_width="0dp"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
             android:background="@drawable/edit_text_bg"
             android:gravity="start|top"
+            android:autofillHints="name"
             android:hint="@string/description"
             android:padding="16dp"
             android:textColor="#333333"
             android:textColorHint="#888888"
             android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/button_add"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/galleryButton" />
+            app:layout_constraintTop_toBottomOf="@+id/button_add" />
 
         <Button
             android:id="@+id/button_add"
-            android:layout_width="0dp"
+            android:layout_width="75dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="32dp"
             android:backgroundTint="@color/primary"
             android:text="@string/upload"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             app:cornerRadius="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

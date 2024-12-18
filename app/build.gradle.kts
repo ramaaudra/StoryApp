@@ -88,6 +88,9 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
 
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+
 
 
 

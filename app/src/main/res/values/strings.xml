@@ -16,13 +16,13 @@
     <string name="logout">Keluar</string>
     <string name="register">belum punya akun? klik untuk daftar</string>
     <string name="add_story">add story</string>
-    <string name="description">Deskripsi</string>
+    <string name="description">Cerita apa yang ingin kamu bagikan...</string>
     <string name="list_item_photo">list item photo</string>
     <string name="story_image">image story</string>
     <string name="photo">"foto "</string>
     <string name="gallery">galeri</string>
     <string name="camera">camera</string>
-    <string name="upload">upload</string>
+    <string name="upload">Post</string>
     <string name="empty_image_warning">Empty Image</string>
     <string name="empty_description_warning">deskripsi, dan gambar wajib diisi</string>
     <string name="empty_name_warning">Name cannot be empty</string>
@@ -30,4 +30,8 @@
     <string name="empty_password_warning">Password cannot be empty</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="retry">Coba lagi</string>
+    <string name="permission_denied">izin tidak diberikan</string>
+    <string name="location_not_found">lokasi tidak ditemukan</string>
+    <string name="create_story">Create Story</string>
+    <string name="bagikan_lokasimu">Bagikan Lokasimu?</string>
 </resources>

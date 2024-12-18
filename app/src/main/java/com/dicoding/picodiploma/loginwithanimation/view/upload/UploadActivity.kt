@@ -1,6 +1,9 @@
 package com.dicoding.picodiploma.loginwithanimation.view.upload
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +14,9 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -25,6 +31,8 @@ import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityUploadBin
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginViewModel
 import com.dicoding.picodiploma.loginwithanimation.view.main.MainActivity
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -43,6 +51,9 @@ class UploadActivity : AppCompatActivity() {
     private val viewModel by viewModels<UploadViewModel> {
         ViewModelFactory.getInstance(this)
     }
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var currentLat: Double? = null
+    private var currentLon: Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,12 +65,16 @@ class UploadActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         binding.galleryButton.setOnClickListener { startGallery() }
         binding.cameraButton.setOnClickListener { startCamera() }
         binding.buttonAdd.setOnClickListener { uploadImage() }
-
+        binding.switch1.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                getCurrentLocation()
+            }
+        }
         observeViewModel()
+        setupLocationClient()
     }
 
     private fun startGallery() {
@@ -115,12 +130,16 @@ class UploadActivity : AppCompatActivity() {
                     requestImageFile
                 )
 
-//                val userPreference = UserPreference.getInstance(dataStore)
-//                val token = userPreference.getSession().first().token
-                viewModel.uploadImage(multipartBody, requestBody)
+                // Menambahkan lokasi jika switch diaktifkan
+                val lat = if (binding.switch1.isChecked) currentLat else null
+                val lon = if (binding.switch1.isChecked) currentLon else null
+
+                // Mengirimkan lokasi bersama dengan gambar dan deskripsi
+                viewModel.uploadImage(multipartBody, requestBody, lat, lon)
             }
         } ?: showToast(getString(R.string.empty_image_warning))
     }
+
 
     private fun observeViewModel() {
         lifecycleScope.launch {
@@ -147,6 +166,80 @@ class UploadActivity : AppCompatActivity() {
             }
         }
     }
+
+
+    private fun requestLocationPermissions() {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+            checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        ) {
+            getCurrentLocation()
+        } else {
+            requestPermissionLauncher.launch(arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+            )
+        }
+    }
+
+    private fun getCurrentLocation() {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+            checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        ) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    currentLat = location.latitude
+                    currentLon = location.longitude
+                } else {
+                    showToast(getString(R.string.location_not_found))
+                }
+            }
+        }
+    }
+
+    private fun setupLocationClient() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        enableLocation()
+    }
+
+    private fun enableLocation() {
+     binding.switch1.setOnCheckedChangeListener{ _, isChecked ->
+            if (isChecked) {
+                requestLocationPermissions()
+            } else {
+                currentLat = null
+                currentLon = null
+            }
+        }
+    }
+
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permission ->
+            when {
+                permission[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
+                    getCurrentLocation()
+                }
+
+                permission[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                    getCurrentLocation()
+                }
+
+                else -> {
+                    showToast(getString(R.string.permission_denied))
+                }
+            }
+        }
+
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE

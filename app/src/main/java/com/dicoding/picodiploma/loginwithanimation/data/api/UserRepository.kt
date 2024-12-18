@@ -43,16 +43,6 @@ class UserRepository private constructor(
         return cachedApiService!!
     }
 
-//    suspend fun getStories(): StoryResponse {
-//        return try {
-//            Log.d("UserRepository", "Fetching stories...")
-//            val service = getApiService()
-//            service.getStories()
-//        } catch (e: Exception) {
-//            Log.e("UserRepository", "Error getting stories: ${e.message}")
-//            throw e
-//        }
-//    }
 
     fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
         @OptIn(ExperimentalPagingApi::class)
@@ -61,11 +51,9 @@ class UserRepository private constructor(
                 pageSize = 10,  // Number of items per page
                 enablePlaceholders = false  // To improve performance, you can set this to false
             ),
-//            remoteMediator = StoryRemoteMediator(storyDatabase, apiService),
             pagingSourceFactory = {
                 // Create a new instance of StoryPagingSource and pass the ApiService
                 StoryPagingSource(apiService)
-//                storyDatabase.storyDao().getAllStory()
             }
         ).flow
     }
@@ -129,12 +117,21 @@ class UserRepository private constructor(
 
     suspend fun uploadImage(
         multipartBody: MultipartBody.Part,
-        requestBody: RequestBody
+        requestBody: RequestBody,
+        lat: Double? = null,
+        lon: Double? = null
+
     ): FileUploadResponse {
         return try {
             Log.d("UserRepository", "Uploading image...")
             val service = getApiService()
-            service.uploadImage(multipartBody, requestBody)
+            val response = service.uploadImage(
+                multipartBody,
+                requestBody,
+                lat,
+                lon
+            )
+            return response
         } catch (e: Exception) {
             Log.e("UserRepository", "Error uploading image: ${e.message}")
             throw e

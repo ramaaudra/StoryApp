@@ -15,14 +15,20 @@ import retrofit2.HttpException
 
 class UploadViewModel(private val repository: UserRepository) : ViewModel() {
 
-    private val _uploadState = MutableStateFlow<ResultState<FileUploadResponse>>(ResultState.Loading)
+    private val _uploadState =
+        MutableStateFlow<ResultState<FileUploadResponse>>(ResultState.Loading)
     val uploadState: StateFlow<ResultState<FileUploadResponse>> = _uploadState
 
-    fun uploadImage(multipartBody: MultipartBody.Part, requestBody: RequestBody) {
+    fun uploadImage(
+        multipartBody: MultipartBody.Part,
+        requestBody: RequestBody,
+        lat: Double? = null,
+        lon: Double? = null
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _uploadState.value = ResultState.Loading
-                val response = repository.uploadImage(multipartBody, requestBody)
+                val response = repository.uploadImage(multipartBody, requestBody, lat, lon)
                 _uploadState.value = ResultState.Success(response)
             } catch (e: Exception) {
                 val errorMessage = when (e) {
