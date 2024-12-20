@@ -34,27 +34,29 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Mengecek status login user pada saat activity dimulai
+        // Initialize binding and check login status
+
         checkLoginStatus()
     }
 
     private fun checkLoginStatus() {
-        runBlocking {
+        lifecycleScope.launch {
             val user = viewModel.getSessionUser().firstOrNull()
             if (user != null && user.token.isNotEmpty()) {
                 Log.d("LoginActivity", "User token: ${user.token}")
-                // If the user is already logged in, navigate to MainActivity
-                val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-                finish()  // Stop LoginActivity
+                navigateToMainActivity()
             } else {
-                // If not logged in, set the content view to show the login screen
                 binding = ActivityLoginBinding.inflate(layoutInflater)
                 setContentView(binding.root)
                 setupAction()
             }
         }
+    }
+
+    private fun navigateToMainActivity() {
+        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        startActivity(intent)
+        finish()  // Stop LoginActivity
     }
 
     private fun setupAction() {
@@ -76,25 +78,20 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.loginState.collect { state ->
                 when (state) {
-                    is ResultState.Loading -> {}
+                    is ResultState.Loading -> {
+                    }
                     is ResultState.Success -> {
                         showLoading(false)
-                        delay(500)
-                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(intent)
-                        finish()
+                        delay(500) // Optional: Slight delay before checking session
+                        checkLoginStatus()
                     }
                     is ResultState.Error -> {
                         showLoading(false)
-                        Toast.makeText(
-                            this@LoginActivity,
-                            state.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showToast(state.message)
                     }
-
-                    ResultState.Finished -> showLoading(false)
+                    is ResultState.Finished -> {
+                        showLoading(false)
+                    }
                 }
             }
         }

@@ -34,4 +34,5 @@
     <string name="location_not_found">lokasi tidak ditemukan</string>
     <string name="create_story">Create Story</string>
     <string name="bagikan_lokasimu">Bagikan Lokasimu?</string>
+    <string name="password_tidak_boleh_kurang_dari_8_karakter">Password tidak boleh kurang dari 8 karakter</string>
 </resources>

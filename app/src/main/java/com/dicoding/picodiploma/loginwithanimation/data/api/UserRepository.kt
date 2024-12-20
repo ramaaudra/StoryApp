@@ -20,7 +20,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
 
-
 class UserRepository private constructor(
     private val userPreference: UserPreference,
     private val apiService: ApiService
@@ -35,11 +34,10 @@ class UserRepository private constructor(
             if (user.token.isEmpty()) {
                 throw Exception("Token is empty")
             }
-            cachedApiService = ApiConfig.getApiService(user.token)
+            cachedApiService = ApiConfig.getApiService(userPreference)
         }
         return cachedApiService!!
     }
-
 
     fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
         @OptIn(ExperimentalPagingApi::class)
@@ -69,7 +67,7 @@ class UserRepository private constructor(
     suspend fun register(name: String, email: String, password: String): String {
         return try {
             Log.d("UserRepository", "Registering user...")
-            val response = ApiConfig.getApiService("").register(name, email, password)
+            val response = ApiConfig.getApiService(userPreference).register(name, email, password)
             response.message ?: "Registration successful"
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()?.let {
@@ -82,7 +80,7 @@ class UserRepository private constructor(
     suspend fun login(email: String, password: String): String {
         return try {
             Log.d("UserRepository", "Logging in user...")
-            val response = ApiConfig.getApiService("").login(email, password)
+            val response = ApiConfig.getApiService(userPreference).login(email, password)
 
             val token = response.loginResult?.token
                 ?: throw Exception("Token not received from server")
@@ -98,8 +96,8 @@ class UserRepository private constructor(
                 userPreference.saveSession(user)
             }
 
-            // Update ApiService with the new token
-            updateApiService(token)
+            // After successful login, update ApiService with the latest token
+            updateApiService(userPreference)
 
             response.message ?: "Login successful"
         } catch (e: Exception) {
@@ -108,8 +106,8 @@ class UserRepository private constructor(
         }
     }
 
-    private fun updateApiService(token: String) {
-        cachedApiService = ApiConfig.getApiService(token)
+    private fun updateApiService(preferences: UserPreference) {
+        cachedApiService = ApiConfig.getApiService(preferences)
     }
 
     suspend fun uploadImage(
@@ -117,7 +115,6 @@ class UserRepository private constructor(
         requestBody: RequestBody,
         lat: Double? = null,
         lon: Double? = null
-
     ): FileUploadResponse {
         return try {
             Log.d("UserRepository", "Uploading image...")

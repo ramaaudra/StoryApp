@@ -46,8 +46,9 @@ class ViewModelFactory private constructor(
 
         @JvmStatic
         fun getInstance(context: Context,): ViewModelFactory {
-            clearInstance()
-
+            if (INSTANCE != null) {
+                clearInstance()
+            }
             synchronized(ViewModelFactory::class.java) {
                 val userRepository = Injection.provideRepository(context)
                 val locationRepository = Injection.provideLocationRepository(context)

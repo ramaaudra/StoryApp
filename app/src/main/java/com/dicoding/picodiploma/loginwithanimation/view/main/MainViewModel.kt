@@ -26,8 +26,8 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
     private val _storyResultState = MutableLiveData<ResultState<PagingData<ListStoryItem>>>()
     val storyResultState: LiveData<ResultState<PagingData<ListStoryItem>>> = _storyResultState
 
-    fun getSession(): LiveData<UserModel> {
-        return repository.getSession().asLiveData()
+    fun getSession(): Flow<UserModel> {
+        return repository.getSession()
     }
 
     fun logout() {
@@ -36,19 +36,6 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 
-
-//    fun getStories() {
-//        viewModelScope.launch {
-//            try {
-//                _stories.value = ResultState.Loading
-//                val response = repository.getStories()
-//                _stories.value = ResultState.Success(response)
-//            } catch (e: Exception) {
-//                android.util.Log.e("MainViewModel", "Error: ${e.message}", e)
-//                _stories.value = ResultState.Error(e.message ?: "Unknown error")
-//            }
-//        }
-//    }
 
     fun getStoryById(storyId: String) {
         viewModelScope.launch {

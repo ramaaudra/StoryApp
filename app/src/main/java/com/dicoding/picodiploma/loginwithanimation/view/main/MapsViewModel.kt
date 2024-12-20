@@ -19,7 +19,7 @@ class MapsViewModel(private val locationRepository: LocationRepository) : ViewMo
                 val stories = locationRepository.getStoriesWithLocation()
                 _storyList.value = stories
             } catch (e: Exception) {
-                // handle error
+                //handle error
             }
         }
     }
